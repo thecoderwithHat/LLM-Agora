@@ -66,7 +66,12 @@ def generate_answer(model_name, prompt, max_new_tokens=256, use_ollama=False):
             add_generation_prompt=True,
             return_tensors="pt",
         ).to(model.device)
-        model_inputs = {"input_ids": inputs, "attention_mask": torch.ones_like(inputs)}
+        if isinstance(inputs, torch.Tensor):
+            model_inputs = {"input_ids": inputs}
+        else:
+            model_inputs = dict(inputs)
+        if "attention_mask" not in model_inputs:
+            model_inputs["attention_mask"] = torch.ones_like(model_inputs["input_ids"])
     else:
         model_inputs = tokenizer(str(prompt), return_tensors="pt").to(model.device)
 
