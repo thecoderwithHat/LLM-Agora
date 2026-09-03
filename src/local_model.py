@@ -45,6 +45,12 @@ def generate_answer(
             timeout=120,
         )
         if response.status_code == 404:
+            error_text = response.text.lower()
+            if "model" in error_text:
+                raise RuntimeError(
+                    f"Ollama model '{model_name}' was not found at "
+                    f"{ollama_base_url}: {response.text}"
+                )
             response = requests.post(
                 f"{ollama_base_url}/v1/chat/completions",
                 json={
@@ -54,6 +60,11 @@ def generate_answer(
                 },
                 timeout=120,
             )
+            if response.status_code == 404:
+                raise RuntimeError(
+                    f"Ollama API endpoint was not found at {ollama_base_url}. "
+                    "Check the Ollama server URL and API availability."
+                )
             response.raise_for_status()
             content = response.json()["choices"][0]["message"]["content"]
             return {"model": model_name, "content": content}

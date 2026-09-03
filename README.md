@@ -222,8 +222,8 @@ In addition, by executing the 'Custom Inference' code, inference about custom in
 **Math**
 ```
 python Math/math_inference.py \
-    --model_1 llama3.2 \
-    --model_2 qwen2.5 \
+    --model_1 llama3.2:1b \
+    --model_2 qwen2.5:0.5b \
     --model_3 mistral \
     --ollama \
     --ollama_url http://100.104.249.20:11434 \
@@ -233,8 +233,8 @@ python Math/math_inference.py \
 **GSM8K**
 ```
 python GSM8K/gsm_inference.py \
-    --model_1 llama3.2 \
-    --model_2 qwen2.5 \
+    --model_1 llama3.2:1b \
+    --model_2 qwen2.5:0.5b \
     --model_3 mistral \
     --ollama \
     --ollama_url http://100.104.249.20:11434 \
@@ -244,8 +244,8 @@ python GSM8K/gsm_inference.py \
 **MMLU**
 ```
 python MMLU/mmlu_inference.py \
-    --model_1 llama3.2 \
-    --model_2 qwen2.5 \
+    --model_1 llama3.2:1b \
+    --model_2 qwen2.5:0.5b \
     --model_3 mistral \
     --ollama \
     --ollama_url http://100.104.249.20:11434 \
@@ -255,8 +255,8 @@ python MMLU/mmlu_inference.py \
 **Custom Inference**
 ```
 python inference/inference.py \
-    --model_1 llama3.2 \
-    --model_2 qwen2.5 \
+    --model_1 llama3.2:1b \
+    --model_2 qwen2.5:0.5b \
     --model_3 mistral \
     --ollama \
     --ollama_url http://100.104.249.20:11434 \
