@@ -32,16 +32,32 @@ def generate_answer(
         if isinstance(prompt, list):
             prompt = "\n\n".join(str(message) for message in prompt)
 
+        ollama_base_url = ollama_url.rstrip("/")
+        request_body = {
+            "model": model_name,
+            "prompt": str(prompt),
+            "stream": False,
+            "options": {"num_predict": max_new_tokens},
+        }
         response = requests.post(
-            f"{ollama_url.rstrip('/')}/api/generate",
-            json={
-                "model": model_name,
-                "prompt": str(prompt),
-                "stream": False,
-                "options": {"num_predict": max_new_tokens},
-            },
+            f"{ollama_base_url}/api/generate",
+            json=request_body,
             timeout=120,
         )
+        if response.status_code == 404:
+            response = requests.post(
+                f"{ollama_base_url}/v1/chat/completions",
+                json={
+                    "model": model_name,
+                    "messages": [{"role": "user", "content": str(prompt)}],
+                    "max_tokens": max_new_tokens,
+                },
+                timeout=120,
+            )
+            response.raise_for_status()
+            content = response.json()["choices"][0]["message"]["content"]
+            return {"model": model_name, "content": content}
+
         response.raise_for_status()
         return {"model": model_name, "content": response.json()["response"]}
 
