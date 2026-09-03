@@ -1,3 +1,5 @@
 {
-    "qwen": "Qwen/Qwen2.5-7B-Instruct"
+    "qwen": "Qwen/Qwen2.5-7B-Instruct",
+    "llama3": "meta-llama/Llama-3.2-3B-Instruct",
+    "mistral": "mistralai/Mistral-7B-Instruct-v0.3"
 }

@@ -34,16 +34,30 @@ def generate_answer(model_name, prompt, max_new_tokens=256):
 
     tokenizer = _tokenizers[model_id]
     model = _models[model_id]
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    if isinstance(prompt, dict):
+        prompt = prompt["content"]
+    if isinstance(prompt, list):
+        prompt = "\n\n".join(str(message) for message in prompt)
+
+    if tokenizer.chat_template:
+        messages = [{"role": "user", "content": str(prompt)}]
+        inputs = tokenizer.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            return_tensors="pt",
+        ).to(model.device)
+        model_inputs = {"input_ids": inputs, "attention_mask": torch.ones_like(inputs)}
+    else:
+        model_inputs = tokenizer(str(prompt), return_tensors="pt").to(model.device)
 
     with torch.no_grad():
         output = model.generate(
-            **inputs,
+            **model_inputs,
             max_new_tokens=max_new_tokens,
             do_sample=False,
             pad_token_id=tokenizer.eos_token_id,
         )
 
-    generated_tokens = output[0][inputs["input_ids"].shape[-1]:]
+    generated_tokens = output[0][model_inputs["input_ids"].shape[-1]:]
     text = tokenizer.decode(generated_tokens, skip_special_tokens=True)
     return {"model": model_name, "content": text}
