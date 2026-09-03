@@ -21,6 +21,11 @@ def args_parse():
         action="store_true",
         help="Use models served by a local Ollama instance.",
     )
+    parser.add_argument(
+        "--ollama_url",
+        default="http://localhost:11434",
+        help="Ollama server URL.",
+    )
     parser.add_argument("--round", default=2, type=int)
     parser.add_argument(
         "--cot",
@@ -46,20 +51,28 @@ def load_json(prompt_path, endpoint_path):
 
     return prompt_dict, endpoint_dict
 
-def construct_message(agent_context, instruction, idx, use_ollama=False):
+def construct_message(
+    agent_context, instruction, idx, use_ollama=False, ollama_url="http://localhost:11434"
+):
     prefix_string = "Here are a list of opinions from different agents: "
 
     prefix_string = prefix_string + agent_context + "\n\n Write a summary of the different opinions from each of the individual agent."
 
     completion = generate_local_answer(
-        "qwen", prefix_string, max_new_tokens=256, use_ollama=use_ollama
+        "qwen",
+        prefix_string,
+        max_new_tokens=256,
+        use_ollama=use_ollama,
+        ollama_url=ollama_url,
     )["content"]
 
     prefix_string = f"Here is a summary of responses from other agents: {completion}"
     prefix_string = prefix_string + "\n\n Use this summarization carefully as additional advice, can you provide an updated answer? Make sure to state your answer at the end of the response." + instruction
     return prefix_string
 
-def summarize_message(agent_contexts, instruction, idx, use_ollama=False):
+def summarize_message(
+    agent_contexts, instruction, idx, use_ollama=False, ollama_url="http://localhost:11434"
+):
     prefix_string = "Here are a list of opinions from different agents: "
 
     for agent in agent_contexts:
@@ -69,7 +82,7 @@ def summarize_message(agent_contexts, instruction, idx, use_ollama=False):
         prefix_string = prefix_string + response
 
     prefix_string = prefix_string + "\n\n Write a summary of the different opinions from each of the individual agent."
-    completion = construct_message(prefix_string, instruction, idx, use_ollama)
+    completion = construct_message(prefix_string, instruction, idx, use_ollama, ollama_url)
 
     return completion
 
@@ -89,7 +102,12 @@ if __name__ == "__main__":
     prompt_dict, _ = load_json("src/prompt_template.json", "src/inference_endpoint.json")
 
     def generate_answer(model, formatted_prompt):
-        return generate_local_answer(model, formatted_prompt, use_ollama=args.ollama)
+        return generate_local_answer(
+            model,
+            formatted_prompt,
+            use_ollama=args.ollama,
+            ollama_url=args.ollama_url,
+        )
     
     def prompt_formatting(model, instruction, cot):
         if model == "alpaca" or model == "orca":
@@ -128,7 +146,11 @@ if __name__ == "__main__":
             if debate != 0:
                 message.append(
                     summarize_message(
-                        agent_contexts, question, 2 * debate - 1, args.ollama
+                        agent_contexts,
+                        question,
+                        2 * debate - 1,
+                        args.ollama,
+                        args.ollama_url,
                     )
                 )
                 for i in range(len(agent_contexts)):

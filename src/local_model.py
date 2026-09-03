@@ -19,7 +19,13 @@ def _model_id(model_name):
     return model_name
 
 
-def generate_answer(model_name, prompt, max_new_tokens=256, use_ollama=False):
+def generate_answer(
+    model_name,
+    prompt,
+    max_new_tokens=256,
+    use_ollama=False,
+    ollama_url="http://localhost:11434",
+):
     if use_ollama:
         if isinstance(prompt, dict):
             prompt = prompt["content"]
@@ -27,7 +33,7 @@ def generate_answer(model_name, prompt, max_new_tokens=256, use_ollama=False):
             prompt = "\n\n".join(str(message) for message in prompt)
 
         response = requests.post(
-            "http://localhost:11434/api/generate",
+            f"{ollama_url.rstrip('/')}/api/generate",
             json={
                 "model": model_name,
                 "prompt": str(prompt),

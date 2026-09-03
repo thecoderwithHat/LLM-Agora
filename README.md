@@ -216,7 +216,7 @@ pip install -r src/requirements.txt
 
 You can do inference by executing the following Math, GSM8K, and MMLU codes. 
 At this time, you can do inferences using CoT by adding just one line, `--cot`.
-To use models served by a local [Ollama](https://ollama.com/) instance, add `--ollama` and pass Ollama model names such as `llama3.2` or `qwen2.5` as the model arguments. Ollama must be running at its default address, `http://localhost:11434`.
+To use models served by a local [Ollama](https://ollama.com/) instance, add `--ollama` and pass Ollama model names such as `llama3.2` or `qwen2.5` as the model arguments. Ollama defaults to `http://localhost:11434`; use `--ollama_url http://100.104.249.20:11434` when connecting to the server shown in the Ollama log.
 In addition, by executing the 'Custom Inference' code, inference about custom instructions is possible.
 
 **Math**
@@ -226,6 +226,7 @@ python Math/math_inference.py \
     --model_2 qwen2.5 \
     --model_3 mistral \
     --ollama \
+    --ollama_url http://100.104.249.20:11434 \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
@@ -236,6 +237,7 @@ python GSM8K/gsm_inference.py \
     --model_2 qwen2.5 \
     --model_3 mistral \
     --ollama \
+    --ollama_url http://100.104.249.20:11434 \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
@@ -246,6 +248,7 @@ python MMLU/mmlu_inference.py \
     --model_2 qwen2.5 \
     --model_3 mistral \
     --ollama \
+    --ollama_url http://100.104.249.20:11434 \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
@@ -256,6 +259,7 @@ python inference/inference.py \
     --model_2 qwen2.5 \
     --model_3 mistral \
     --ollama \
+    --ollama_url http://100.104.249.20:11434 \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
