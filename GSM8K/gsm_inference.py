@@ -125,10 +125,11 @@ if __name__ == "__main__":
         )
     
     def prompt_formatting(model, instruction, cot):
-        if model == "alpaca" or model == "orca":
-            prompt = prompt_dict[model]["prompt_no_input"]
+        template_model = model.split(":", 1)[0]
+        if template_model == "alpaca" or template_model == "orca":
+            prompt = prompt_dict[template_model]["prompt_no_input"]
         else:
-            prompt = prompt_dict[model]["prompt"]
+            prompt = prompt_dict.get(template_model, prompt_dict["qwen"])["prompt"]
         
         if cot:
             instruction += "Let's think step by step."
