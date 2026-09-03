@@ -25,6 +25,11 @@ def args_parse():
         default="http://localhost:11434",
         help="Ollama server URL.",
     )
+    parser.add_argument(
+        "--ollama_summary_model",
+        default="qwen2.5:0.5b",
+        help="Ollama model used to summarize debate responses.",
+    )
     parser.add_argument("--round", default=2, type=int)
     parser.add_argument(
         "--cot",
@@ -51,14 +56,19 @@ def load_json(prompt_path, endpoint_path):
     return prompt_dict, endpoint_dict
 
 def construct_message(
-    agent_context, instruction, idx, use_ollama=False, ollama_url="http://localhost:11434"
+    agent_context,
+    instruction,
+    idx,
+    use_ollama=False,
+    ollama_url="http://localhost:11434",
+    summary_model="qwen",
 ):
     prefix_string = "Here are a list of opinions from different agents: "
 
     prefix_string = prefix_string + agent_context + "\n\n Write a summary of the different opinions from each of the individual agent."
 
     completion = generate_local_answer(
-        "qwen",
+        summary_model if use_ollama else "qwen",
         prefix_string,
         max_new_tokens=256,
         use_ollama=use_ollama,
@@ -70,7 +80,12 @@ def construct_message(
     return prefix_string
 
 def summarize_message(
-    agent_contexts, instruction, idx, use_ollama=False, ollama_url="http://localhost:11434"
+    agent_contexts,
+    instruction,
+    idx,
+    use_ollama=False,
+    ollama_url="http://localhost:11434",
+    summary_model="qwen",
 ):
     prefix_string = "Here are a list of opinions from different agents: "
 
@@ -81,7 +96,9 @@ def summarize_message(
         prefix_string = prefix_string + response
 
     prefix_string = prefix_string + "\n\n Write a summary of the different opinions from each of the individual agent."
-    completion = construct_message(prefix_string, instruction, idx, use_ollama, ollama_url)
+    completion = construct_message(
+        prefix_string, instruction, idx, use_ollama, ollama_url, summary_model
+    )
 
     return completion
 
@@ -150,6 +167,7 @@ if __name__ == "__main__":
                         2 * debate - 1,
                         args.ollama,
                         args.ollama_url,
+                        args.ollama_summary_model,
                     )
                 )
                 for i in range(len(agent_contexts)):
