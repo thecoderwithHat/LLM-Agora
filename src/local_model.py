@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import requests
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -18,7 +19,26 @@ def _model_id(model_name):
     return model_name
 
 
-def generate_answer(model_name, prompt, max_new_tokens=256):
+def generate_answer(model_name, prompt, max_new_tokens=256, use_ollama=False):
+    if use_ollama:
+        if isinstance(prompt, dict):
+            prompt = prompt["content"]
+        if isinstance(prompt, list):
+            prompt = "\n\n".join(str(message) for message in prompt)
+
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": model_name,
+                "prompt": str(prompt),
+                "stream": False,
+                "options": {"num_predict": max_new_tokens},
+            },
+            timeout=120,
+        )
+        response.raise_for_status()
+        return {"model": model_name, "content": response.json()["response"]}
+
     model_id = _model_id(model_name)
 
     if model_id not in _tokenizers:

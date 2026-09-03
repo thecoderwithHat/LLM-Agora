@@ -216,45 +216,46 @@ pip install -r src/requirements.txt
 
 You can do inference by executing the following Math, GSM8K, and MMLU codes. 
 At this time, you can do inferences using CoT by adding just one line, `--cot`.
+To use models served by a local [Ollama](https://ollama.com/) instance, add `--ollama` and pass Ollama model names such as `llama3.2` or `qwen2.5` as the model arguments. Ollama must be running at its default address, `http://localhost:11434`.
 In addition, by executing the 'Custom Inference' code, inference about custom instructions is possible.
 
 **Math**
 ```
 python Math/math_inference.py \
-    --model_1 llama \
-    --model_2 wizardlm \
-    --model_3 orca \
-    --API_KEY your_OpenAI_API_KEY \
+    --model_1 llama3.2 \
+    --model_2 qwen2.5 \
+    --model_3 mistral \
+    --ollama \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
 **GSM8K**
 ```
 python GSM8K/gsm_inference.py \
-    --model_1 llama \
-    --model_2 wizardlm \
-    --model_3 orca \
-    --API_KEY your_OpenAI_API_KEY \
+    --model_1 llama3.2 \
+    --model_2 qwen2.5 \
+    --model_3 mistral \
+    --ollama \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
 **MMLU**
 ```
 python MMLU/mmlu_inference.py \
-    --model_1 llama \
-    --model_2 wizardlm \
-    --model_3 orca \
-    --API_KEY your_OpenAI_API_KEY \
+    --model_1 llama3.2 \
+    --model_2 qwen2.5 \
+    --model_3 mistral \
+    --ollama \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
 **Custom Inference**
 ```
 python inference/inference.py \
-    --model_1 model_you_want \
-    --model_2 model_you_want \
-    --model_3 model_you_want \
-    --API_KEY your_OpenAI_API_KEY \
+    --model_1 llama3.2 \
+    --model_2 qwen2.5 \
+    --model_3 mistral \
+    --ollama \
     --cot    # If you write '--cot', cot is used. If you don't want to use cot, you don't have to write.
 ```
 
