@@ -4,20 +4,18 @@ from tqdm import tqdm
 import json
 import time
 import random
-import openai
 import argparse
 import requests
+import sys
+
+sys.path.append("src")
+from local_model import generate_answer as generate_local_answer
 
 def args_parse():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_1", type=str)
     parser.add_argument("--model_2", type=str)
     parser.add_argument("--model_3", type=str)
-    parser.add_argument(
-        "--API_KEY",
-        type=str,
-        help="your OpenAI API key to use gpt-3.5-turbo"
-    )
     parser.add_argument("--round", default=2, type=int)
     parser.add_argument(
         "--cot",
@@ -48,19 +46,7 @@ def construct_message(agent_context, instruction, idx):
 
     prefix_string = prefix_string + agent_context + "\n\n Write a summary of the different opinions from each of the individual agent."
 
-    message = [{"role": "user", "content": prefix_string}]
-
-    try:
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
-            messages=message,
-            max_tokens=256,
-            n=1
-        )['choices'][0]['message']['content']
-    except:
-        print("retrying ChatGPT due to an error......")
-        time.sleep(5)
-        return construct_message(agent_context, instruction, idx)
+    completion = generate_local_answer("qwen", prefix_string, max_new_tokens=256)["content"]
 
     prefix_string = f"Here is a summary of responses from other agents: {completion}"
     prefix_string = prefix_string + "\n\n Use this summarization carefully as additional advice, can you provide an updated answer? Make sure to state your answer at the end of the response." + instruction
@@ -91,29 +77,12 @@ def generate_mmlu(agents, question):
 
 if __name__ == "__main__":
     args = args_parse()
-    openai.api_key = args.API_KEY
     model_list = [args.model_1, args.model_2, args.model_3]
 
-    prompt_dict, endpoint_dict = load_json("src/prompt_template.json", "src/inference_endpoint.json")
+    prompt_dict, _ = load_json("src/prompt_template.json", "src/inference_endpoint.json")
 
     def generate_answer(model, formatted_prompt):
-        API_URL = endpoint_dict[model]["API_URL"]
-        headers = endpoint_dict[model]["headers"]
-        payload = {
-            "inputs": formatted_prompt,
-            "parameters": {
-                "max_new_tokens": 256
-            }
-        }
-        try:
-            resp = requests.post(API_URL, json=payload, headers=headers)
-            response = resp.json()
-        except:
-            print("retrying due to an error......")
-            time.sleep(5)
-            return generate_answer(API_URL, headers, payload)
-        
-        return {"model": model, "content": response[0]["generated_text"]}
+        return generate_local_answer(model, formatted_prompt)
     
     def prompt_formatting(model, instruction, cot):
         if model == "alpaca" or model == "orca":

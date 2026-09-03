@@ -8,3 +8,6 @@ random
 argparse
 re
 pandas
+torch
+transformers
+accelerate
