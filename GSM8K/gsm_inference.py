@@ -197,7 +197,7 @@ if __name__ == "__main__":
         file_name = ".json"
 
     print(f"The result file 'gsm_result{file_name}' is saving...")
-    with open(args.output_dir + f"/gsm_result{file_name}", "x") as f:
+    with open(args.output_dir + f"/gsm_result{file_name}", "w") as f:
         json.dump(generated_description, f, indent=4)
 
     print("All done!!")
